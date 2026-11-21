@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#172a23">
+<title>Lô Tô Hội Bạn</title>
+<link rel="stylesheet" href="/styles.css">
+<script type="module" src="/app.js"></script>
+</head>
+<body>
+<header class="top"><a href="/">LÔ TÔ <span>HỘI BẠN</span></a><span>2–8 người · Chơi online</span></header>
+<main>
+<section id="welcome" class="welcome">
+  <div class="intro">
+    <div class="balls" aria-hidden="true"><span>07</span><span>28</span><span>63</span></div>
+    <h1>Lô Tô<br><em>Hội Bạn</em></h1>
+    <p>Bóc số, dò vé, đủ một hàng thì hô Kinh!</p>
+  </div>
+  <form id="entry" class="panel">
+    <h2>Vào bàn chơi</h2>
+    <label for="name">Tên của bạn</label>
+    <input id="name" maxlength="24" required placeholder="Ví dụ: Nguyên" autocomplete="nickname">
+    <button class="primary" type="submit" value="create">Tạo phòng</button>
+    <div class="divider"><span>Đã có mã phòng?</span></div>
+    <label for="code">Mã phòng</label>
+    <div class="join"><input id="code" maxlength="6" placeholder="ABC234" autocapitalize="characters" autocomplete="off"><button type="submit" value="join">Vào phòng</button></div>
+  </form>
+</section>
+<section id="game" hidden>
+  <div class="toolbar">
+    <div><small>MÃ PHÒNG</small><h1 id="roomCode"></h1></div>
+    <div class="tools"><button id="invite" type="button">Sao chép link mời</button><button id="leave" type="button">Rời phòng</button></div>
+  </div>
+  <div class="layout">
+    <div class="panel board">
+      <div class="board-head"><div><small id="round"></small><h2 id="phase"></h2></div><div id="ball" class="ball" aria-label="Số vừa bóc">–</div></div>
+      <p id="gameHint"></p>
+      <div id="pages" class="pages" aria-label="Trang vé" hidden>
+        <button type="button" id="page1" aria-pressed="true">Trang 1</button>
+        <button type="button" id="page2" aria-pressed="false">Trang 2</button>
+      </div>
+      <div id="card" class="card" aria-label="Vé lô tô của bạn"></div>
+      <div class="actions"><button id="start" class="primary" hidden>Bắt đầu</button><button id="draw" class="primary" hidden>Bóc số</button><button id="claim" class="claim" hidden>Kinh!</button></div>
+    </div>
+    <aside class="side">
+      <section class="panel"><h2>Người chơi <small id="count"></small></h2><ol id="players"></ol></section>
+      <section class="panel"><h2>Số đã bóc <small id="drawCount"></small></h2><div id="history" class="history"></div></section>
+    </aside>
+  </div>
+</section>
+<p id="notice" role="status" hidden></p>
+</main>
+</body>
+</html>
