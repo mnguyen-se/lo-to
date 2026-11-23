@@ -6,6 +6,7 @@ try { session = JSON.parse(sessionStorage.getItem(sessionKey)); } catch { sessio
 if (queryCode && session?.code !== queryCode.toUpperCase()) session = null;
 let room = null;
 let selectedPage = 0;
+const marked = new Set();
 let busy = false;
 let polling = false;
 let noticeTimer;
@@ -42,10 +43,21 @@ function saveSession(value) {
 function apply(next) {
   if (!next || next.code !== session?.code) return;
   if (room && room.code === next.code && room.revision >= next.revision) return;
-  if (room?.round !== next.round) selectedPage = 0;
+  if (room?.code !== next.code || room?.you !== next.you || room?.round !== next.round) {
+    selectedPage = 0;
+    marked.clear();
+  }
   if (next.winner?.id === next.you && !room?.winner) selectedPage = (next.winner.page ?? 1) - 1;
   room = next;
   render();
+}
+
+function markedLine() {
+  for (const [page, rows] of room.pages.entries()) {
+    const row = rows.findIndex(cells => cells.every(n => n === null || marked.has(n)));
+    if (row >= 0) return { page: page + 1, row: row + 1 };
+  }
+  return null;
 }
 
 function render() {
@@ -57,7 +69,6 @@ function render() {
   const host = room.host === room.you;
   const playing = phase === 'playing';
   const drawnSet = new Set(drawn);
-  const hasWinningRow = pages.some(page => page.some(row => row.every(n => n === null || drawnSet.has(n))));
   const page = pages[selectedPage];
   $('pages').hidden = pages.length < 2 || phase === 'waiting';
   $('card').hidden = !page || phase === 'waiting';
@@ -69,7 +80,7 @@ function render() {
   $('phase').textContent = winner ? winner.name + ' đã Kinh!' : playing ? 'Vé của bạn' : 'Chờ bắt đầu';
   $('ball').textContent = drawn.at(-1) ?? '–';
   $('gameHint').textContent = winner ? 'Thắng với hàng số ' + winner.row + ' trên trang ' + (winner.page ?? 1) + '. Chủ phòng có thể mở ván mới.'
-    : playing ? 'Vé tự đánh dấu các số đã bóc. Đủ 5 số trên một hàng thì bấm Kinh!'
+    : playing ? 'Bấm ô có số đã bóc để đánh dấu. Đủ 5 số đã đánh dấu trên một hàng thì bấm Kinh!'
     : players.length < 2 ? 'Mời thêm ít nhất một người để bắt đầu.' : 'Chủ phòng có thể bắt đầu ván chơi.';
   $('count').textContent = players.length + '/8';
   $('drawCount').textContent = drawn.length + '/90';
@@ -82,13 +93,26 @@ function render() {
     const panel = document.createElement('div');
     panel.className = 'ticket-panel';
     panel.append(...page.slice(panelIndex * 3, panelIndex * 3 + 3).flatMap((row, i) => row.map(n => {
-    const cell = document.createElement('div');
+    const cell = document.createElement(n === null ? 'div' : 'button');
     cell.className = 'cell';
     if (n === null) {
       cell.classList.add('empty');
       cell.setAttribute('aria-hidden', 'true');
     } else {
       cell.textContent = n;
+      cell.type = 'button';
+      cell.disabled = !playing || !drawnSet.has(n);
+      const updateMark = () => {
+        cell.classList.toggle('marked', marked.has(n));
+        cell.setAttribute('aria-pressed', String(marked.has(n)));
+      };
+      updateMark();
+      cell.onclick = () => {
+        if (marked.has(n)) marked.delete(n);
+        else marked.add(n);
+        updateMark();
+        $('claim').disabled = busy || !markedLine();
+      };
       if (drawnSet.has(n)) {
         cell.classList.add('hit');
         cell.setAttribute('aria-label', n + ', đã bóc');
@@ -111,7 +135,7 @@ function render() {
   $('draw').hidden = !host || !playing;
   $('draw').disabled = busy || drawn.length === 90;
   $('claim').hidden = !playing;
-  $('claim').disabled = busy || !hasWinningRow;
+  $('claim').disabled = busy || !markedLine();
 }
 
 async function act(action, data = {}) {
@@ -147,7 +171,10 @@ $('entry').addEventListener('submit', event => {
 });
 $('start').onclick = () => act('start', { round: room.round });
 $('draw').onclick = () => act('draw', { round: room.round, count: room.drawn.length });
-$('claim').onclick = () => act('claim', { round: room.round });
+$('claim').onclick = () => {
+  const line = markedLine();
+  if (line) act('claim', { round: room.round, ...line });
+};
 $('page1').onclick = () => { selectedPage = 0; render(); };
 $('page2').onclick = () => { selectedPage = 1; render(); };
 $('leave').onclick = () => act('leave');

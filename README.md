@@ -20,6 +20,6 @@ Cần Node.js 22 trở lên. Trong thư mục project, chạy `npm run dev` và 
 
 - Mỗi người được phát hai trang vé vuông. Mỗi trang có 3 khung, mỗi khung 3 hàng và mỗi hàng 5 số. Bộ hai trang chứa đủ 90 số, mỗi số xuất hiện một lần.
 - Chủ phòng bấm **Bóc số** để lấy ngẫu nhiên một số từ 1 đến 90. Mỗi số chỉ xuất hiện một lần. Các máy đồng bộ khoảng mỗi 2,2 giây.
-- Vé tự đánh dấu các số đã bóc. Khi đủ cả 5 số trên một hàng ở bất kỳ trang nào, bấm **Kinh!**. Người gửi yêu cầu hợp lệ đầu tiên thắng ván.
+- Bấm vào ô có số đã bốc trên vé để đánh dấu. Bấm lại để bỏ dấu. Khi đánh dấu đủ 5 số trên một hàng, bấm **Kinh!**. Người gửi yêu cầu hợp lệ đầu tiên thắng ván.
 - Chủ phòng có thể mở ván mới sau khi có người thắng. Người mới vào được giữa các ván.
 - Tải lại cùng tab sẽ giữ phiên. Khi muốn thoát, dùng **Rời phòng** để nhường chỗ. Nếu chủ phòng rời bằng nút đó, quyền chủ phòng chuyển cho người tiếp theo. Đóng tab vẫn giữ chỗ trong phòng. Phòng trên Vercel hết hạn sau 24 giờ kể từ lần cập nhật trạng thái cuối cùng.
